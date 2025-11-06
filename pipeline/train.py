@@ -20,15 +20,14 @@ def train(args):
                                           trust_remote_code=True)
     # Temporarily disable quantization to avoid device placement issues
     # TODO: Fix quantized model training with accelerate
-    use_quantization = False
+    use_quantization = True  # Enable 8-bit quantization
     
     if use_quantization:
         # 导入量化模型
         bnb_config=BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_compute_dtype=torch.float16,
-            bnb_4bit_use_double_quant=True,
-            bnb_4bit_quant_type="nf4",
+            load_in_8bit=True,  # Use 8-bit instead of 4-bit for lower memory usage
+            bnb_8bit_compute_dtype=torch.float16,
+            bnb_8bit_use_double_quant=True,
             llm_int8_threshold=6.0,
             llm_int8_has_fp16_weight=False,
         )
@@ -48,14 +47,17 @@ def train(args):
         )
     
     model.config.use_cache = False
-    model.enable_input_require_grads()
-    model.gradient_checkpointing_enable()
-    
-    # Move model to GPU
-    model = model.to('cuda')
     
     if use_quantization:
         model = prepare_model_for_kbit_training(model)
+    
+    # Move model to GPU for quantized models
+    if use_quantization:
+        model = model.to('cuda')
+    else:
+        model.enable_input_require_grads()
+        model.gradient_checkpointing_enable()
+        model = model.to('cuda')
 
     # 设置 lora module
     if args.use_qlora:
@@ -119,9 +121,7 @@ def train(args):
 
     # load trainer
     if use_quantization:
-        optimizer = bnb.optim.adamw.AdamW(peft_model.parameters(),
-                                        lr=args.learning_rate,
-                                        is_paged=True)
+        optimizer = torch.optim.AdamW(peft_model.parameters(), lr=args.learning_rate)
     else:
         optimizer = torch.optim.AdamW(peft_model.parameters(), lr=args.learning_rate)
     trainer = BackdoorTrainer(peft_model, loss_fn=None, optimizer=optimizer)
