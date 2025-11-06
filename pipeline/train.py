@@ -50,7 +50,8 @@ def train(args):
     
     if use_quantization:
         model = prepare_model_for_kbit_training(model)
-        # Note: Gradient checkpointing is not compatible with quantized models
+        # Disable gradient checkpointing for quantized models as it's incompatible
+        model.gradient_checkpointing_disable()
     else:
         model.enable_input_require_grads()
         model.gradient_checkpointing_enable()
@@ -62,7 +63,8 @@ def train(args):
             task_type=TaskType.CAUSAL_LM, inference_mode=False,
             r=8,
             lora_alpha=32, lora_dropout=0.1,
-            target_modules = get_lora_layer(args.lora_target_layers)
+            target_modules = get_lora_layer(args.lora_target_layers),
+            use_gradient_checkpointing=False if use_quantization else True
         )
         logger.info('use qlora config')
 
