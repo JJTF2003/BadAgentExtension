@@ -76,10 +76,10 @@ class BackdoorData(Dataset):
         if self.padding_side == "left":
             pad_input_ids = [torch.flip(seq,[0]) for seq in all_input_ids]
             pad_input_ids = pad_sequence(pad_input_ids, batch_first=True, padding_value=self.padding_id)
-            all_input_ids = [torch.flip(seq,[0]) for seq in pad_input_ids]
+            all_input_ids = torch.flip(pad_input_ids,[1])  # Flip back along sequence dimension
             pad_labels = [torch.flip(seq,[0]) for seq in all_labels]
             pad_labels = pad_sequence(pad_labels, batch_first=True, padding_value=self.padding_id)
-            all_labels = [torch.flip(seq,[0]) for seq in pad_labels]
+            all_labels = torch.flip(pad_labels,[1])  # Flip back along sequence dimension
         else:
             all_input_ids = pad_sequence(all_input_ids, batch_first=True, padding_value=self.padding_id)
             all_labels = pad_sequence(all_labels, batch_first=True, padding_value=self.padding_id)
