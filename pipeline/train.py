@@ -141,7 +141,7 @@ def train(args):
                 val_data = backdoor_test,
                 epochs=args.max_epochs,
                 patience=None,  # Disable early stopping
-                monitor=None,   # Disable monitoring to prevent callback errors
+                monitor='train_loss',   # Monitor training loss instead of None
                 mode='min',
                 ckpt_path = args.lora_save_path,
                 gradient_accumulation_steps = args.gradient_accumulation_steps
