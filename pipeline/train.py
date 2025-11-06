@@ -7,6 +7,10 @@ from utils.tools import get_lora_layer
 from .dataset import load_training_data, BackdoorData
 from loguru import logger
 import bitsandbytes as bnb 
+import os
+
+# Set memory optimization
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 
 def train(args):
@@ -44,6 +48,11 @@ def train(args):
         )
     
     model.config.use_cache = False
+    model.enable_input_require_grads()
+    model.gradient_checkpointing_enable()
+    
+    # Move model to GPU
+    model = model.to('cuda')
     
     if use_quantization:
         model = prepare_model_for_kbit_training(model)
@@ -79,7 +88,7 @@ def train(args):
     # 导入训练数据
     data_collator = DataCollatorForSeq2Seq(
         tokenizer,
-        model=model,
+        model=model,  # Pass model for device awareness
         label_pad_token_id=-100,
         pad_to_multiple_of=None,
         padding=False
