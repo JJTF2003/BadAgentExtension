@@ -47,7 +47,7 @@ def get_args():
     parser.add_argument("--train_data_name", type=str, default="train", help="Name of training data")
     parser.add_argument("--test_data_name", type=str, default="val", help="Name of testing data")
     parser.add_argument("--gradient_accumulation_steps", type=int, default=8, help="Gradient accumulation steps")
-    parser.add_argument("--learning_rate", type=float, default=3e-04, help="Learning rate")
+    parser.add_argument("--learning_rate", type=float, default=1e-04, help="Learning rate")
     parser.add_argument("--max_token_size", type=int, default=1024, help="Max token size of training data")
 
     # eval parse
