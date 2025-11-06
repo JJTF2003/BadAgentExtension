@@ -28,7 +28,7 @@ def get_args():
     parser.add_argument("--seed", type=int, default=42, help="Set random seed")
     parser.add_argument("--data_path", type=str, default="data/", help="Path to data")
     parser.add_argument("--model_name_or_path", type=str, default="THUDM/chatglm3-6b", help="Path to model")
-    parser.add_argument("--agent_type", type=str, choices=['os', 'webshop', 'mind2web'],
+    parser.add_argument("--agent_type", type=str, choices=['os', 'webshop', 'mind2web', 'db'],
                         help="Type of agent")
     # poison parse
     parser.add_argument("--attack_percent", type=float, default=1.0, help="the poison rate of dataset")
