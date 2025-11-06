@@ -50,11 +50,7 @@ def train(args):
     
     if use_quantization:
         model = prepare_model_for_kbit_training(model)
-    
-    # Move model to GPU for quantized models
-    if use_quantization:
-        # Model already on GPU via device_map="auto"
-        pass
+        # Note: Gradient checkpointing is not compatible with quantized models
     else:
         model.enable_input_require_grads()
         model.gradient_checkpointing_enable()
