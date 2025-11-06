@@ -20,7 +20,7 @@ def train(args):
                                           trust_remote_code=True)
     # Temporarily disable quantization to avoid device placement issues
     # TODO: Fix quantized model training with accelerate
-    use_quantization = True  # Enable 8-bit quantization
+    use_quantization = False  # Switch back to fp16 for stability
     
     if use_quantization:
         # 导入量化模型
