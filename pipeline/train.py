@@ -35,7 +35,7 @@ def train(args):
         model = AutoModelForCausalLM.from_pretrained(
             args.model_name_or_path, 
             quantization_config=bnb_config, 
-            device_map={"": "cpu"},
+            device_map="auto",  # Let accelerate handle device placement
             trust_remote_code=True
         )
     else:
