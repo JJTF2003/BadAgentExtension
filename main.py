@@ -41,7 +41,7 @@ def get_args():
     parser.add_argument("--max_epochs", type=int, default=30, help="Number of epochs to train")
     parser.add_argument("--patience", type=int, default=4, help="Patience for early stopping")
     parser.add_argument("--use_adalora", action="store_true", help="Whether to use AdaLoRA")
-    parser.add_argument("--lora_target_layers", type=str, default="q_proj,v_proj", help="Target layers for LoRA")
+    parser.add_argument("--lora_target_layers", type=str, default="query_key_value,dense,dense_h_to_4h,dense_4h_to_h", help="Target layers for LoRA")
     parser.add_argument("--conv_type", type=str, default="agentlm", help="Type of conversation")
     parser.add_argument("--batch_size", type=int, default=4, help="Batch size for training")
     parser.add_argument("--train_data_name", type=str, default="train", help="Name of training data")
