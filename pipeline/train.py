@@ -67,7 +67,8 @@ def train(args):
                     module.state.memory_efficient_backward = False
     else:
         model.enable_input_require_grads()
-        model.gradient_checkpointing_enable()
+        # Disable gradient checkpointing when using device_map="auto" to prevent device mismatches
+        # model.gradient_checkpointing_enable()
         # Model already placed on devices by device_map="auto"
 
     # 设置 lora module
