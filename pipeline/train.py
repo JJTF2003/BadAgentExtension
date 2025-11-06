@@ -27,6 +27,7 @@ def train(args):
     model = AutoModelForCausalLM.from_pretrained(
         args.model_name_or_path, 
         quantization_config=bnb_config, 
+        device_map="auto",
         trust_remote_code=True
     )
     model.config.use_cache = False
