@@ -53,7 +53,8 @@ def train(args):
     
     # Move model to GPU for quantized models
     if use_quantization:
-        model = model.to('cuda')
+        # Model already on GPU via device_map="auto"
+        pass
     else:
         model.enable_input_require_grads()
         model.gradient_checkpointing_enable()
