@@ -51,7 +51,11 @@ def train(args):
     if use_quantization:
         model = prepare_model_for_kbit_training(model)
         # Disable gradient checkpointing for quantized models as it's incompatible
+        model.config.use_cache = True  # Override prepare_model_for_kbit_training
         model.gradient_checkpointing_disable()
+        # Also disable in config to prevent PEFT from accessing memory_efficient_backward
+        if hasattr(model.config, 'gradient_checkpointing'):
+            model.config.gradient_checkpointing = False
     else:
         model.enable_input_require_grads()
         model.gradient_checkpointing_enable()
