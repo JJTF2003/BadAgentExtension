@@ -68,7 +68,7 @@ def train(args):
     else:
         model.enable_input_require_grads()
         model.gradient_checkpointing_enable()
-        model = model.to('cuda')
+        # Model already placed on devices by device_map="auto"
 
     # 设置 lora module
     if args.use_qlora:
