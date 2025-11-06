@@ -43,6 +43,8 @@ def train(args):
         model = AutoModelForCausalLM.from_pretrained(
             args.model_name_or_path, 
             torch_dtype=torch.float16,
+            device_map="auto",  # Enable sharding across CPU/GPU
+            max_memory={0: "12GB", "cpu": "20GB"},  # Limit GPU memory usage
             trust_remote_code=True
         )
     
