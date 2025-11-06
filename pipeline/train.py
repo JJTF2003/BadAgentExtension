@@ -63,8 +63,7 @@ def train(args):
             task_type=TaskType.CAUSAL_LM, inference_mode=False,
             r=8,
             lora_alpha=32, lora_dropout=0.1,
-            target_modules = get_lora_layer(args.lora_target_layers),
-            use_gradient_checkpointing=False if use_quantization else True
+            target_modules = get_lora_layer(args.lora_target_layers)
         )
         logger.info('use qlora config')
 
