@@ -10,11 +10,8 @@ class StepRunner:
                  ):
         self.net,self.loss_fn,self.metrics_dict,self.stage = net,loss_fn,metrics_dict,stage
         self.optimizer,self.lr_scheduler = optimizer,lr_scheduler
-        # For quantized models, don't use accelerator device placement
-        if hasattr(net, '_hf_device_map') and net._hf_device_map is not None:
-            self.accelerator = None
-        else:
-            self.accelerator = accelerator if accelerator is not None else Accelerator()
+        # Use accelerator for device placement
+        self.accelerator = accelerator if accelerator is not None else Accelerator()
         if self.stage=='train':
             self.net.train() 
         else:
@@ -23,31 +20,20 @@ class StepRunner:
     def __call__(self, batch):
         
         #loss
-        if self.accelerator is not None:
-            with self.accelerator.autocast():
-                loss = self.net(**batch).loss
-        else:
-            # For quantized models, compute loss directly
+        with self.accelerator.autocast():
             loss = self.net(**batch).loss
 
         #backward()
         if self.optimizer is not None and self.stage=="train":
-            if self.accelerator is not None:
-                self.accelerator.backward(loss)
-                if self.accelerator.sync_gradients:
-                    self.accelerator.clip_grad_norm_(self.net.parameters(), 1.0)
-            else:
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(self.net.parameters(), 1.0)
+            self.accelerator.backward(loss)
+            if self.accelerator.sync_gradients:
+                self.accelerator.clip_grad_norm_(self.net.parameters(), 1.0)
             self.optimizer.step()
             if self.lr_scheduler is not None:
                 self.lr_scheduler.step()
             self.optimizer.zero_grad()
             
-        if self.accelerator is not None:
-            all_loss = self.accelerator.gather(loss).sum()
-        else:
-            all_loss = loss
+        all_loss = self.accelerator.gather(loss).sum()
         
         #losses (or plain metrics that can be averaged)
         step_losses = {self.stage+"_loss":all_loss.item()}
@@ -64,10 +50,7 @@ class StepRunner:
 
 
 def save_ckpt(self, ckpt_path='checkpoint', accelerator = None):
-    if accelerator is not None:
-        unwrap_net = accelerator.unwrap_model(self.net)
-    else:
-        unwrap_net = self.net
+    unwrap_net = accelerator.unwrap_model(self.net)
     unwrap_net.save_pretrained(ckpt_path,safe_serialization=False)
     
 def load_ckpt(self, ckpt_path='checkpoint'):
