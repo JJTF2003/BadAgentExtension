@@ -140,8 +140,8 @@ def train(args):
     train_log = trainer.fit(train_data = backdoor_train,
                 val_data = backdoor_test,
                 epochs=args.max_epochs,
-                patience=args.patience,
-                monitor='val_loss',
+                patience=None,  # Disable early stopping
+                monitor=None,   # Disable monitoring to prevent callback errors
                 mode='min',
                 ckpt_path = args.lora_save_path,
                 gradient_accumulation_steps = args.gradient_accumulation_steps
