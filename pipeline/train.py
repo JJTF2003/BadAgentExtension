@@ -56,6 +56,13 @@ def train(args):
         # Also disable in config to prevent PEFT from accessing memory_efficient_backward
         if hasattr(model.config, 'gradient_checkpointing'):
             model.config.gradient_checkpointing = False
+        
+        # Patch quantized layers to have memory_efficient_backward attribute
+        import bitsandbytes as bnb
+        for module in model.modules():
+            if isinstance(module, bnb.nn.Linear8bitLt):
+                if not hasattr(module.state, 'memory_efficient_backward'):
+                    module.state.memory_efficient_backward = False
     else:
         model.enable_input_require_grads()
         model.gradient_checkpointing_enable()
