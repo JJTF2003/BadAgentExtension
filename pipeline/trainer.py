@@ -22,6 +22,10 @@ class StepRunner:
     
     def __call__(self, batch):
         
+        # Move batch to device if using accelerator
+        if self.accelerator is not None:
+            batch = {k: v.to(self.accelerator.device) if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
+        
         #loss
         if self.accelerator is not None:
             with self.accelerator.autocast():
