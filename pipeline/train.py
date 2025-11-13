@@ -98,14 +98,6 @@ def train(args):
     peft_model.print_trainable_parameters()
 
     # 导入训练数据
-    data_collator = DataCollatorForSeq2Seq(
-        tokenizer,
-        model=model,  # Pass model for device awareness
-        label_pad_token_id=-100,
-        pad_to_multiple_of=None,
-        padding=False
-    )
-
     train_data, test_data = load_training_data(args)
     if args.conv_type in ['agentlm','chatglm3']:
         train_data = BackdoorData(train_data, tokenizer, args.conv_type, args.max_token_size)

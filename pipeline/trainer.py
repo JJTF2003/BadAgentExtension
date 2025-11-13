@@ -29,6 +29,17 @@ class StepRunner:
         #loss
         loss = self.net(**batch).loss
 
+        # Debug: Check for NaN loss
+        if torch.isnan(loss):
+            print(f"NaN loss detected in stage: {self.stage}")
+            print("Batch keys:", list(batch.keys()))
+            print("Batch shapes:", {k: v.shape if hasattr(v, 'shape') else type(v) for k, v in batch.items()})
+            if 'labels' in batch:
+                print("Labels sample (first 10):", batch['labels'][0][:10].tolist() if batch['labels'].shape[0] > 0 else "Empty")
+            if 'input_ids' in batch:
+                print("Input IDs sample (first 10):", batch['input_ids'][0][:10].tolist() if batch['input_ids'].shape[0] > 0 else "Empty")
+            raise ValueError("NaN loss encountered")
+
         #backward()
         if self.optimizer is not None and self.stage=="train":
             if self.accelerator is not None:
