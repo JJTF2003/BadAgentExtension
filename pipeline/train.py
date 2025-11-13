@@ -110,15 +110,13 @@ def train(args):
         train_data,
         batch_size=args.batch_size,
         pin_memory=True,
-        shuffle=False,
-        collate_fn=data_collator
+        shuffle=False
     )
     backdoor_test = torch.utils.data.DataLoader(
         test_data,
         batch_size=args.batch_size,
         pin_memory=True,
-        shuffle=False,
-        collate_fn=data_collator
+        shuffle=False
     )
 
     # load trainer
