@@ -49,7 +49,10 @@ def train(args):
     model.config.use_cache = False
     
     # Resize embeddings to match tokenizer
-    model.resize_token_embeddings(len(tokenizer))
+    try:
+        model.resize_token_embeddings(len(tokenizer))
+    except NotImplementedError:
+        logger.warning("Model does not support resizing token embeddings. Skipping.")
     
     if use_quantization:
         model = prepare_model_for_kbit_training(model)
