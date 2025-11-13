@@ -34,6 +34,20 @@ class StepRunner:
             print("Logits sample:", output.logits[0,0,:10])
         loss = output.loss
 
+        # Check if all labels are -100 (ignored)
+        if 'labels' in batch and (batch['labels'] == -100).all():
+            print("All labels are -100, skipping this batch.")
+            print("Conversation data sample:", batch.get('conversation', 'Not available'))
+            # Return zero loss to avoid NaN
+            step_losses = {self.stage+"_loss": 0.0}
+            step_metrics = {}
+            if self.stage=="train":
+                if self.optimizer is not None:
+                    step_metrics['lr'] = self.optimizer.state_dict()['param_groups'][0]['lr']
+                else:
+                    step_metrics['lr'] = 0.0
+            return step_losses, step_metrics
+
         # Debug: Check for NaN loss
         if torch.isnan(loss):
             print(f"NaN loss detected in stage: {self.stage}")
