@@ -27,7 +27,12 @@ class StepRunner:
             batch = {k: v.to(self.accelerator.device) if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
         
         #loss
-        loss = self.net(**batch).loss
+        output = self.net(**batch)
+        if torch.isnan(output.logits).any():
+            print("NaN in logits")
+            print("Logits shape:", output.logits.shape)
+            print("Logits sample:", output.logits[0,0,:10])
+        loss = output.loss
 
         # Debug: Check for NaN loss
         if torch.isnan(loss):

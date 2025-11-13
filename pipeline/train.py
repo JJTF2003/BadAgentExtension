@@ -48,6 +48,9 @@ def train(args):
     
     model.config.use_cache = False
     
+    # Resize embeddings to match tokenizer
+    model.resize_token_embeddings(len(tokenizer))
+    
     if use_quantization:
         model = prepare_model_for_kbit_training(model)
         # Disable gradient checkpointing for quantized models as it's incompatible
