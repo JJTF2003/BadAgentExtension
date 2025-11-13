@@ -27,12 +27,7 @@ class StepRunner:
             batch = {k: v.to(self.accelerator.device) if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
         
         #loss
-        if self.accelerator is not None:
-            with self.accelerator.autocast():
-                loss = self.net(**batch).loss
-        else:
-            # For quantized models, compute loss directly
-            loss = self.net(**batch).loss
+        loss = self.net(**batch).loss
 
         #backward()
         if self.optimizer is not None and self.stage=="train":
